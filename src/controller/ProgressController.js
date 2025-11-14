@@ -104,7 +104,7 @@ export const listProgress = async (req, res) => {
              FROM MG_UPDATE_PROGRESS MUP
                       LEFT JOIN MG_OPERATORS MP ON MP.OPERATOR_ID = MUP.OPERATOR_ID
              WHERE MUP.OPERATOR_ID = :operatorID
-             ORDER BY MUP.LAST_UPDATED_DATE DESC`,
+             ORDER BY MUP.PROJECT_CATEGORY DESC, MUP.LAST_UPDATED_DATE DESC`,
             {operatorID},
             {outFormat: oracledb.OUT_FORMAT_OBJECT}
         );
@@ -232,6 +232,119 @@ export const removeProgress = async (req, res) => {
             });
         }
 
+    } catch (err) {
+        console.error("Error Exception:", err);
+        return res.status(500).json({
+            success: false,
+            message: "Server error. Please try again later.",
+            error: err.message,
+        });
+    }
+}
+
+export const countAllProgress = async (req, res) => {
+    try {
+        const {operatorID} = req.body;
+        const conn = await getConnection();
+
+        const result = await conn.execute(
+            `SELECT COUNT(*) AS TOTAL
+             FROM MG_UPDATE_PROGRESS
+             WHERE OPERATOR_ID = :operatorID`,
+            {operatorID},
+            {outFormat: oracledb.OUT_FORMAT_OBJECT}
+        );
+
+        return res.status(200).json({
+            success: true,
+            count: result.rows[0]?.TOTAL || 0,
+        });
+    } catch (err) {
+        console.error("Error Exception:", err);
+        return res.status(500).json({
+            success: false,
+            message: "Server error. Please try again later.",
+            error: err.message,
+        });
+    }
+}
+
+export const countFinishedProgress = async (req, res) => {
+    try {
+        const {operatorID} = req.body;
+        const conn = await getConnection();
+
+        const result = await conn.execute(
+            `SELECT COUNT(*) AS TOTAL
+             FROM MG_UPDATE_PROGRESS
+             WHERE OPERATOR_ID = :operatorID
+               AND LOWER(PROGRESS_STATUS) = LOWER('Lived')`,
+            {operatorID},
+            {outFormat: oracledb.OUT_FORMAT_OBJECT}
+        );
+
+        return res.status(200).json({
+            success: true,
+            count: result.rows[0]?.TOTAL || 0,
+        });
+    } catch (err) {
+        console.error("Error Exception:", err);
+        return res.status(500).json({
+            success: false,
+            message: "Server error. Please try again later.",
+            error: err.message,
+        });
+    }
+}
+
+export const countUnfinishedProgress = async (req, res) => {
+    try {
+        const {operatorID} = req.body;
+        const conn = await getConnection();
+
+        const result = await conn.execute(
+            `SELECT COUNT(*) AS TOTAL
+             FROM MG_UPDATE_PROGRESS
+             WHERE OPERATOR_ID = :operatorID
+               AND LOWER(PROGRESS_STATUS) != LOWER('Lived')`,
+            {operatorID},
+            {outFormat: oracledb.OUT_FORMAT_OBJECT}
+        );
+
+        return res.status(200).json({
+            success: true,
+            count: result.rows[0]?.TOTAL || 0,
+        });
+    } catch (err) {
+        console.error("Error Exception:", err);
+        return res.status(500).json({
+            success: false,
+            message: "Server error. Please try again later.",
+            error: err.message,
+        });
+    }
+}
+
+export const countProgressByMonth = async (req, res) => {
+    try {
+        const {operatorID} = req.body;
+        const conn = await getConnection();
+
+        const result = await conn.execute(
+            `SELECT COUNT(*)                              AS TOTAL,
+                    TO_CHAR(LAST_UPDATED_DATE, 'YYYY-MM') AS LAST_UPDATED_DATE,
+                    PROGRESS_STATUS
+             FROM MG_UPDATE_PROGRESS
+             WHERE OPERATOR_ID = :operatorID
+             GROUP BY TO_CHAR(LAST_UPDATED_DATE, 'YYYY-MM'), PROGRESS_STATUS`,
+            {operatorID},
+            {outFormat: oracledb.OUT_FORMAT_OBJECT}
+        );
+
+        return res.status(200).json({
+            success: true,
+            count: result.rows,
+        });
     } catch (err) {
         console.error("Error Exception:", err);
         return res.status(500).json({

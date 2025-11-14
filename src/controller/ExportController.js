@@ -1,7 +1,8 @@
-import * as XLSX from "xlsx";
+/*import * as XLSX from "xlsx";*/
+/*import {getFlags} from "oracledb/lib/thin/sqlnet/ANO.js";*/
+
 import ExcelJS from "exceljs";
 import {getConnection} from "../config/dbconfig.js";
-import {getFlags} from "oracledb/lib/thin/sqlnet/ANO.js";
 
 export const exportExcel = async (req, res) => {
     try {
@@ -36,7 +37,7 @@ export const exportExcel = async (req, res) => {
                              LEFT JOIN MG_OPERATORS MP ON MP.OPERATOR_ID = MUP.OPERATOR_ID
                     WHERE MUP.OPERATOR_ID = :operatorID
                       AND TRUNC(MUP.LAST_UPDATED_DATE) = TO_DATE(:filterDate, 'YYYY-MM-DD')
-                    ORDER BY MUP.LAST_UPDATED_DATE DESC`,
+                    ORDER BY MUP.PROJECT_CATEGORY, MUP.LAST_UPDATED_DATE DESC`,
             {
                 operatorID,
                 filterDate: date

@@ -80,3 +80,69 @@ export const getRoleDetail = async (req, res) => {
     }
 }
 
+export const operatorList = async (req, res) => {
+    try {
+        const conn = await getConnection();
+
+        const result = await conn.execute(
+            `SELECT OP.*, R.ROLE_NAME, R.ROLE_TYPE
+             FROM MG_OPERATORS OP
+                      LEFT JOIN MG_ROLES R ON R.ROLE_ID = OP.ROLE_ID`,
+            [],
+            {outFormat: oracledb.OUT_FORMAT_OBJECT}
+        );
+
+        if (!result.rows || result.rows.length === 0) {
+            return res.json({
+                success: false,
+                message: "Data not found",
+            });
+        }
+
+        const rows = result.rows;
+
+        // Loop through each row and convert LOBs
+        for (const row of rows) {
+            if (row.OPERATOR_IMAGE) {
+                row.OPERATOR_IMAGE = await readLobToBase64(row.OPERATOR_IMAGE);
+            }
+        }
+
+        return res.json({
+            success: true,
+            operator: rows,
+        });
+    } catch (err) {
+        console.error("Database error:", err);
+        return res.status(500).json({success: false, message: "Internal server error"});
+    }
+}
+
+export const operatorRoleList = async (req, res) => {
+    try {
+        const conn = await getConnection();
+
+        const result = await conn.execute(
+            `SELECT *
+             FROM MG_ROLES OP`,
+            [],
+            {outFormat: oracledb.OUT_FORMAT_OBJECT}
+        );
+
+        if (!result.rows || result.rows.length === 0) {
+            return res.json({
+                success: false,
+                message: "Data not found",
+            });
+        }
+
+        return res.json({
+            success: true,
+            role: result.rows,
+        });
+    } catch (err) {
+        console.error("Database error:", err);
+        return res.status(500).json({success: false, message: "Internal server error"});
+    }
+}
+
