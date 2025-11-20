@@ -7,7 +7,7 @@ export const getIsServiceSuspended = async (req, res) => {
         const conn = await getConnection();
 
         const result = await conn.execute(
-            `SELECT IS_SERVICES_SUSPENDED, MERCHANTID, MERCHANTNAME
+            `SELECT IS_SERVICES_SUSPENDED
              FROM BR_MERCHANT_DETAILS
              WHERE MERCHANTID = :merchantId
                AND MERCHANTNAME = :merchantName`,
@@ -15,9 +15,11 @@ export const getIsServiceSuspended = async (req, res) => {
             {outFormat: oracledb.OUT_FORMAT_OBJECT}
         );
 
+        const data = result.rows[0].IS_SERVICES_SUSPENDED;
+
         return res.status(200).json({
             success: true,
-            data: result.rows,
+            data: JSON.parse(data),
         });
     } catch (err) {
         console.error("Error Exception:", err);
