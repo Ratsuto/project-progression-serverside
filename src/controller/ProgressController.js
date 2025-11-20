@@ -103,7 +103,7 @@ export const listProgress = async (req, res) => {
             `SELECT MUP.*, MP.OPERATOR_NAME
              FROM MG_UPDATE_PROGRESS MUP
                       LEFT JOIN MG_OPERATORS MP ON MP.OPERATOR_ID = MUP.OPERATOR_ID
-             WHERE MUP.OPERATOR_ID = :operatorID
+             WHERE (:operatorID IS NULL OR MUP.OPERATOR_ID = :operatorID)
              ORDER BY MUP.PROJECT_CATEGORY DESC, MUP.LAST_UPDATED_DATE DESC`,
             {operatorID},
             {outFormat: oracledb.OUT_FORMAT_OBJECT}

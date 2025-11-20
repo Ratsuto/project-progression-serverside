@@ -18,7 +18,7 @@ export const getUserDetail = async (req, res) => {
             `SELECT OP.*, R.ROLE_NAME, R.ROLE_TYPE
              FROM MG_OPERATORS OP
                       LEFT JOIN MG_ROLES R ON R.ROLE_ID = OP.ROLE_ID
-             WHERE OP.OPERATOR_ID = :username`,
+             WHERE (:username IS NULL OR OP.OPERATOR_ID = :username)`,
             {username},
             {outFormat: oracledb.OUT_FORMAT_OBJECT}
         );
