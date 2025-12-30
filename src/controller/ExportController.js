@@ -87,6 +87,20 @@ export const exportExcel = async (req, res) => {
 
         // ✅ Add rows
         result.rows.forEach((row, index) => {
+            const planStartDate = new Date(row[5]);
+            const planEndDate = new Date(row[7] || row[6]);
+            const actualStartDate = new Date(row[8]);
+            const actualEndDate = new Date(row[9] || row[10]);
+
+            const planDiffDays = Math.round(
+                (planEndDate - planStartDate) / (1000 * 60 * 60 * 24)
+            );
+
+            const actualDiffDays = Math.round(
+                (actualEndDate - actualStartDate) / (1000 * 60 * 60 * 24)
+            );
+
+
             worksheet.addRow({
                 Team: "",
                 ID: row[0],
@@ -97,11 +111,11 @@ export const exportExcel = async (req, res) => {
                 PLAN_DEV_START: row[5] || '',
                 PLAN_DEV_END: row[6] || '',
                 PLAN_LIVE: row[7] || '',
-                PLAN_MANDAY: Math.round(((new Date(row[7] || row[6])) - new Date(row[5])) / (1000 * 60 * 60 * 24)),
+                PLAN_MANDAY: planDiffDays < 0 ? 0 : planDiffDays,
                 ACTUAL_DEV_START: row[8] || '',
                 ACTUAL_DEV_END: row[9] || '',
                 ACTUAL_LIVE: row[10] || '',
-                ACTUAL_MANDAY: Math.round(((new Date(row[10] || row[9])) - new Date(row[8])) / (1000 * 60 * 60 * 24)),
+                ACTUAL_MANDAY: actualDiffDays < 0 ? 0 : actualDiffDays,
                 LAST_PROGRESS: row[11] / 100 || 0,
                 THIS_PROGRESS: row[12] / 100 || 0,
                 PROGRESS_INCREASE: row[13] / 100 || 0,
