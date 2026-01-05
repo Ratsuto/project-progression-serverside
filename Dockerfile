@@ -1,24 +1,10 @@
-# Stage 1: Builder
-FROM node:22-bullseye AS builder
+FROM node:24-bullseye
 
 WORKDIR /app
 
 COPY package.json package-lock.json ./
 
-RUN npm install --workspaces --omit=dev
+COPY node_modules ./node_modules
 
-COPY . .
-
-RUN npm run build --workspaces
-
-
-# Stage 2: Runner
-FROM node:22-bullseye
-
-WORKDIR /app
-
-COPY --from=builder /app/node_modules ./node_modules
-
-EXPOSE 3000
-
-CMD [ "npm", "start" ]
+EXPOSE 3001
+CMD ["npm", "start"]
