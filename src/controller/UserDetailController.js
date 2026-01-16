@@ -1,5 +1,7 @@
 import {getConnection} from "../config/dbconfig.js";
 import oracledb from "oracledb";
+import {respond} from "../utils/Response.js";
+import {response} from "express";
 
 export const getUserDetail = async (req, res) => {
     try {
@@ -108,13 +110,10 @@ export const operatorList = async (req, res) => {
             }
         }
 
-        return res.json({
-            success: true,
-            operator: rows,
-        });
+        return respond.success(res, 200, 'Operators load successful', true, rows);
     } catch (err) {
         console.error("Database error:", err);
-        return res.status(500).json({success: false, message: "Internal server error"});
+        return respond.error(res, 500, 'Error Exception', false);
     }
 }
 

@@ -7,5 +7,6 @@
     <file url="file://$PROJECT_DIR$/src/controller/ProgressController.js" dialect="GenericSQL" />
     <file url="file://$PROJECT_DIR$/src/controller/UserDetailController.js" dialect="GenericSQL" />
     <file url="file://$PROJECT_DIR$/src/controller/testController.js" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/src/service/userService.js" dialect="GenericSQL" />
   </component>
 </project>
